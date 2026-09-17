@@ -16,7 +16,7 @@ const client = new Client({
   intents: [GatewayIntentBits.Guilds]
 });
 
-// Lista de comandos (Ping, IP, Help y Sorteo)
+// Definición de comandos
 const commands = [
   new SlashCommandBuilder()
     .setName('ping')
@@ -48,13 +48,13 @@ const commands = [
         .setRequired(true))
 ].map(command => command.toJSON());
 
-// Función para registrar los comandos
+// Función para registrar comandos cuando el bot ya está online
 async function registerCommands() {
   const rest = new REST({ version: '10' }).setToken(process.env.TOKEN);
   try {
     console.log('Registrando slash commands...');
     await rest.put(
-      Routes.applicationCommands(process.env.CLIENT_ID),
+      Routes.applicationCommands(client.user.id),
       { body: commands }
     );
     console.log('Slash commands registrados correctamente.');
@@ -63,22 +63,23 @@ async function registerCommands() {
   }
 }
 
-client.once('ready', () => {
+// Evento Ready
+client.once('ready', async () => {
   console.log(`Bot conectado como ${client.user.tag}`);
+  await registerCommands();
 });
 
+// Evento de Interacciones
 client.on('interactionCreate', async interaction => {
   if (!interaction.isChatInputCommand()) return;
 
   const { commandName } = interaction;
 
   try {
-    // COMANDO /PING
     if (commandName === 'ping') {
       await interaction.reply('¡Pong! 🏓');
     }
 
-    // COMANDO /IP
     if (commandName === 'ip') {
       const embed = new EmbedBuilder()
         .setTitle('🌐 IPs de Ultracore Network')
@@ -93,7 +94,6 @@ client.on('interactionCreate', async interaction => {
       await interaction.reply({ embeds: [embed] });
     }
 
-    // COMANDO /HELP
     if (commandName === 'help') {
       const embed = new EmbedBuilder()
         .setTitle('Comandos disponibles')
@@ -109,7 +109,6 @@ client.on('interactionCreate', async interaction => {
       await interaction.reply({ embeds: [embed] });
     }
 
-    // COMANDO /SORTEO
     if (commandName === 'sorteo') {
       const premio = interaction.options.getString('premio');
       const duracionInput = interaction.options.getString('duracion');
@@ -219,7 +218,5 @@ client.on('interactionCreate', async interaction => {
   }
 });
 
-(async () => {
-  await registerCommands();
-  client.login(process.env.TOKEN);
-})();
+// Iniciar sesión
+client.login(process.env.TOKEN);
