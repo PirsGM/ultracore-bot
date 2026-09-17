@@ -27,7 +27,9 @@ client.on('messageCreate', message => {
   }
 
   if (command === 'ip') {
-    message.reply('IP del servidor:\nultracorevip.servegame.com:26399 Bedrock: ultracorevip.servegame.com Puerto: 26399');
+    message.reply('☕ Java:\nultracorevip.servegame.com:26399');
+    message.reply('📱 Bedrock:\nultracorevip.servegame.com');
+    message.reply('🔌 Puerto:\n26399');
   }
 
   if (command === 'help') {
