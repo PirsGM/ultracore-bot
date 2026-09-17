@@ -1,37 +1,71 @@
-const { Client, GatewayIntentBits } = require('discord.js');
+const { Client, GatewayIntentBits, REST, Routes, SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 
 const client = new Client({
-  intents: [
-    GatewayIntentBits.Guilds,
-    GatewayIntentBits.GuildMessages,
-    GatewayIntentBits.MessageContent
-  ]
+  intents: [GatewayIntentBits.Guilds]
 });
 
-client.once('ready', () => {
+const commands = [
+  new SlashCommandBuilder()
+    .setName('ping')
+    .setDescription('Prueba si el bot está online'),
+  
+  new SlashCommandBuilder()
+    .setName('ip')
+    .setDescription('Muestra las IPs del servidor'),
+  
+  new SlashCommandBuilder()
+    .setName('help')
+    .setDescription('Muestra los comandos disponibles')
+].map(command => command.toJSON());
+
+client.once('ready', async () => {
   console.log(`Bot conectado como ${client.user.tag}`);
+
+  const rest = new REST({ version: '10' }).setToken(process.env.TOKEN);
+
+  try {
+    console.log('Registrando slash commands...');
+    await rest.put(
+      Routes.applicationCommands(client.user.id),
+      { body: commands }
+    );
+    console.log('Slash commands registrados correctamente.');
+  } catch (error) {
+    console.error(error);
+  }
 });
 
-client.on('messageCreate', message => {
-  if (message.author.bot) return;
+client.on('interactionCreate', async interaction => {
+  if (!interaction.isChatInputCommand()) return;
 
-  const prefix = '!';
+  const { commandName } = interaction;
 
-  if (!message.content.startsWith(prefix)) return;
-
-  const args = message.content.slice(prefix.length).trim().split(/ +/);
-  const command = args.shift().toLowerCase();
-
-  if (command === 'ping') {
-    message.reply('Pong!');
+  if (commandName === 'ping') {
+    await interaction.reply('¡Pong! 🏓');
   }
 
-  if (command === 'ip') {
-    message.reply('IP del servidor:\nultracorevip.servegame.com:26399');
+  if (commandName === 'ip') {
+    const embed = new EmbedBuilder()
+      .setTitle('🌐 IPs de Ultracore Network')
+      .setColor(0xFF0000)
+      .addFields(
+        { name: '☕ Java', value: '`ultracorevip.servegame.com:26399`', inline: false },
+        { name: '📱 Bedrock', value: '`ultracorevip.servegame.com`', inline: false },
+        { name: '🔌 Puerto', value: '`26399`', inline: false }
+      )
+      .setFooter({ text: 'Ultracore Network' });
+
+    await interaction.reply({ embeds: [embed] });
   }
 
-  if (command === 'help') {
-    message.reply('Comandos disponibles:\n!ping - Prueba el bot\n!ip - Muestra la IP del servidor\n!help - Muestra esta ayuda');
+  if (commandName === 'help') {
+    const embed = new EmbedBuilder()
+      .setTitle('Comandos disponibles')
+      .setColor(0xFF0000)
+      .setDescription('`/ping` - Prueba el bot\n`/ip` - Muestra las IPs del servidor\n`/help` - Muestra esta ayuda')
+      .setFooter({ text: 'Ultracore Network' });
+
+    await interaction.reply({ embeds: [embed] });
   }
 });
 
