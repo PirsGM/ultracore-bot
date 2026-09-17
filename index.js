@@ -1,42 +1,89 @@
-const { Client, GatewayIntentBits } = require('discord.js');
+const { Client, GatewayIntentBits, REST, Routes, SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 
 const client = new Client({
-  intents: [
-    GatewayIntentBits.Guilds,
-    GatewayIntentBits.GuildMessages,
-    GatewayIntentBits.MessageContent
-  ]
+  intents: [GatewayIntentBits.Guilds]
 });
+
+const commands = [
+  new SlashCommandBuilder()
+    .setName('ping')
+    .setDescription('Prueba si el bot está online'),
+  
+  new SlashCommandBuilder()
+    .setName('ip')
+    .setDescription('Muestra las IPs del servidor'),
+  
+  new SlashCommandBuilder()
+    .setName('help')
+    .setDescription('Muestra los comandos disponibles')
+].map(command => command.toJSON());
+
+// Función para registrar comandos globalmente
+async function registerCommands() {
+  const rest = new REST({ version: '10' }).setToken(process.env.TOKEN);
+  try {
+    console.log('Registrando slash commands...');
+    await rest.put(
+      Routes.applicationCommands(process.env.CLIENT_ID), // Se recomienda usar la variable CLIENT_ID de tu .env
+      { body: commands }
+    );
+    console.log('Slash commands registrados correctamente.');
+  } catch (error) {
+    console.error('Error registrando comandos:', error);
+  }
+}
 
 client.once('ready', () => {
   console.log(`Bot conectado como ${client.user.tag}`);
 });
 
-client.on('messageCreate', message => {
-  if (message.author.bot) return;
+client.on('interactionCreate', async interaction => {
+  if (!interaction.isChatInputCommand()) return;
 
-  const prefix = '!';
+  const { commandName } = interaction;
 
-  if (!message.content.startsWith(prefix)) return;
+  try {
+    if (commandName === 'ping') {
+      await interaction.reply('¡Pong! 🏓');
+    }
 
-  const args = message.content.slice(prefix.length).trim().split(/ +/);
-  const command = args.shift().toLowerCase();
+    if (commandName === 'ip') {
+      const embed = new EmbedBuilder()
+        .setTitle('🌐 IPs de Ultracore Network')
+        .setColor(0xFF0000)
+        .addFields(
+          { name: '☕ Java', value: '`ultracorevip.servegame.com:26399`', inline: false },
+          { name: '📱 Bedrock', value: '`ultracorevip.servegame.com`', inline: false },
+          { name: '🔌 Puerto', value: '`26399`', inline: false }
+        )
+        .setFooter({ text: 'Ultracore Network' });
 
-  if (command === 'ping') {
-    message.reply('Pong!');
-  }
+      await interaction.reply({ embeds: [embed] });
+    }
 
-  if (command === 'ip') {
-    message.reply('☕ Java:\nultracorevip.servegame.com:26399');
-    message.reply('📱 Bedrock:\nultracorevip.servegame.com');
-    message.reply('🔌 Puerto:\n26399');
-  }
+    if (commandName === 'help') {
+      const embed = new EmbedBuilder()
+        .setTitle('Comandos disponibles')
+        .setColor(0xFF0000)
+        .setDescription('`/ping` - Prueba el bot\n`/ip` - Muestra las IPs del servidor\n`/help` - Muestra esta ayuda')
+        .setFooter({ text: 'Ultracore Network' });
 
-  if (command === 'help') {
-    message.reply('Comandos disponibles:\n!ping - Prueba el bot\n!ip - Muestra la IP del servidor\n!help - Muestra esta ayuda');
+      await interaction.reply({ embeds: [embed] });
+    }
+  } catch (error) {
+    console.error(`Error ejecutando el comando ${commandName}:`, error);
+    const errorMessage = { content: 'Hubo un error al ejecutar este comando.', ephemeral: true };
+    
+    if (interaction.replied || interaction.deferred) {
+      await interaction.followUp(errorMessage);
+    } else {
+      await interaction.reply(errorMessage);
+    }
   }
 });
 
-client.login(process.env.TOKEN);
-
-client.login(process.env.TOKEN);
+// Registrar comandos e iniciar sesión
+(async () => {
+  await registerCommands();
+  client.login(process.env.TOKEN);
+})();
