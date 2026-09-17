@@ -26,19 +26,15 @@ client.on('messageCreate', message => {
     message.reply('Pong!');
   }
 
-if (commandName === 'ip') {
-    const embed = new EmbedBuilder()
-      .setTitle('🌐 IPs de Ultracore Network')
-      .setColor(0xFF0000)
-      .addFields(
-        { name: '☕ Java', value: '`ultracorevip.servegame.com:26399`', inline: false },
-        { name: '📱 Bedrock', value: '`ultracorevip.servegame.com`', inline: false },
-        { name: '🔌 Puerto', value: '`26399`', inline: false }
+  if (command === 'ip') {
+    message.reply('IP del servidor:\nultracorevip.servegame.com:26399 Bedrock: ultracorevip.servegame.com Puerto: 26399');
   }
 
   if (command === 'help') {
     message.reply('Comandos disponibles:\n!ping - Prueba el bot\n!ip - Muestra la IP del servidor\n!help - Muestra esta ayuda');
   }
 });
+
+client.login(process.env.TOKEN);
 
 client.login(process.env.TOKEN);
