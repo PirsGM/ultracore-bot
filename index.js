@@ -216,7 +216,7 @@ client.on('interactionCreate', async interaction => {
 
       const embed = new EmbedBuilder()
         .setTitle('🎭 Roles de la Comunidad')
-        .setDescription('Haz clic en el botón de abajo para obtener o quitarte el rol.')
+        .setDescription('Haz clic en el botón de abajo para obtener o quitarte el rol de notificaciones para Alianzas.')
         .setColor(0x5865F2);
 
       await interaction.reply({ embeds: [embed], components: [row] });
