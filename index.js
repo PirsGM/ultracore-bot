@@ -108,10 +108,11 @@ client.on('interactionCreate', async interaction => {
     if (commandName === 'ip') {
       const embed = new EmbedBuilder()
         .setTitle('🌐 IPs de Ultracore Network')
-        .setColor(0xFF0000) // Cambiado a Color Rojo
+        .setColor(0xFF0000)
         .addFields(
-          { name: 'Java:', value: '`mc.ultracore.net`', inline: true },
-          { name: 'Bedrock:', value: '`bedrock.ultracore.net` (Puerto: 19132)', inline: true }
+          { name: '☕ Java', value: '`ultracorevip.servegame.com:26399`', inline: false },
+          { name: '📱 Bedrock', value: '`ultracorevip.servegame.com`', inline: false },
+          { name: '🔌 Puerto', value: '`26399`', inline: false }
         )
         .setFooter({ text: 'Ultracore Network' });
 
