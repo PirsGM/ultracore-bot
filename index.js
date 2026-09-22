@@ -33,7 +33,7 @@ const client = new Client({
   ]
 });
 
-// Coloca aquí el ID del rol que quieres entregar con el botón
+// ID del rol que entregará el botón
 const ID_DEL_ROL = '1550356193220759612';
 
 const commands = [
@@ -108,7 +108,7 @@ client.on('interactionCreate', async interaction => {
     if (commandName === 'ip') {
       const embed = new EmbedBuilder()
         .setTitle('🌐 IPs de Ultracore Network')
-        .setColor(0x00FF00)
+        .setColor(0xFF0000) // Cambiado a Color Rojo
         .addFields(
           { name: 'Java:', value: '`mc.ultracore.net`', inline: true },
           { name: 'Bedrock:', value: '`bedrock.ultracore.net` (Puerto: 19132)', inline: true }
@@ -121,11 +121,11 @@ client.on('interactionCreate', async interaction => {
     if (commandName === 'help') {
       const embed = new EmbedBuilder()
         .setTitle('📋 Lista de Comandos')
-        .setColor(0x0099FF)
+        .setColor(0xFF0000)
         .setDescription(
           '`/ping` - Revisa la latencia\n' +
           '`/ip` - Muestra la IP del servidor\n' +
-          '`/sorteo` - Inicia un sorteo (Solo Admins)\n' +
+          '`/sorteo` - Crea un sorteo (Solo Admins)\n' +
           '`/rol-boton` - Envía botón para rol (Solo Admins)'
         );
 
@@ -216,7 +216,7 @@ client.on('interactionCreate', async interaction => {
 
       const embed = new EmbedBuilder()
         .setTitle('🎭 Roles de la Comunidad')
-        .setDescription('Haz clic en el botón de abajo para obtener o quitarte el rol de notificaciones para Alianzas.')
+        .setDescription('Haz clic en el botón de abajo para obtener o quitarte el rol.')
         .setColor(0x5865F2);
 
       await interaction.reply({ embeds: [embed], components: [row] });
@@ -228,7 +228,7 @@ client.on('interactionCreate', async interaction => {
     if (interaction.customId === 'participar_sorteo') {
       const sorteo = sorteos.get(interaction.message.id);
       if (!sorteo) {
-        return interaction.reply({ content: 'Este sorteo ya ha terminado.', flags: MessageFlags.Ephemeral });
+        return interaction.reply({ content: 'Este sorteo ya ha terminado o expiró.', flags: MessageFlags.Ephemeral });
       }
 
       if (sorteo.participantes.has(interaction.user.id)) {
